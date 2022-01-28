@@ -76,7 +76,13 @@ main{
 
 h1{
     text-align: center;
-    padding: 10px
+    padding: 10px;
+    
+}
+
+h3{
+    padding: 3px 10px;
+    margin: auto 0;
 }
 
 .action{
@@ -102,6 +108,11 @@ footer{
     border: none;
 }
 
+.priorityTask:hover{
+    transform: scale3d(1.1, 1.1, 1.1);
+    transition: transform 0.5s;
+}
+
 .lowPriority{
     background-color: var(--color-lowpriority);
 }
@@ -116,5 +127,26 @@ footer{
 
 .selectPriority{
     border: 2px solid black;
-    /* transition: all 0.5s; */
+}
+
+.finishTask{
+    width: 25px;
+    height: 25px;
+    padding: 5px;
+    background-image: url('data:image/svg+xml,%3Csvg xmlns="http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 1200 1200"%3E%3Cpath d="M1004.237 99.152l-611.44 611.441l-198.305-198.305L0 706.779l198.305 198.306l195.762 195.763L588.56 906.355L1200 294.916L1004.237 99.152z" fill="currentColor"%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    cursor: pointer;
+}
+
+.deleteTask{
+    width: 25px;
+    height: 25px;
+    padding: 5px;
+    background-image: url('data:image/svg+xml,%3Csvg xmlns="http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 16 16"%3E%3Cg fill="none"%3E%3Cpath d="M10 4h3a.5.5 0 0 1 0 1h-.553l-.752 6.776A2.5 2.5 0 0 1 9.21 14H6.79a2.5 2.5 0 0 1-2.485-2.224L3.552 5H3a.5.5 0 0 1 0-1h3a2 2 0 1 1 4 0zM8 3a1 1 0 0 0-1 1h2a1 1 0 0 0-1-1zM6.5 7v4a.5.5 0 0 0 1 0V7a.5.5 0 0 0-1 0zM9 6.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 1 0V7a.5.5 0 0 0-.5-.5z" fill="currentColor"%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    cursor: pointer;
 }
