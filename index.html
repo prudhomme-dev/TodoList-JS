@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="cache-control" content="no-cache">
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/todolist.css">
+    <title>TodoList</title>
+</head>
+
+<body>
+
+    <main>
+        <h1>Ma Todo-List</h1>
+
+
+        <section class="action flex">
+            <input type="text" name="newTask" id="newTask" placeholder="Nouvelle tâche">
+            <div class="priorityTask lowPriority" data-priority="0"></div>
+            <div class="priorityTask normalPriority selectPriority" data-priority="1"></div>
+            <div class="priorityTask importantPriority" data-priority="2"></div>
+
+        </section>
+        <section class="list">
+            <div class="task flex">
+                <h3 class="titleTask">Titre de l'action</h3>
+                <div class="actionTask flex">
+                    <a href="#" class="finishTask">Terminée</a>
+                    <a href="#" class="deleteTask">Supprimer</a>
+                </div>
+            </div>
+
+
+
+        </section>
+    </main>
+    <footer>
+        <p><small class="copyright">2022 - Cédric PRUD'HOMME -
+                <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img
+                        alt="Licence Creative Commons"
+                        src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a></small></p>
+    </footer>
+
+
+</body>
+<script src="js/todolist.js"></script>
+
+</html>
