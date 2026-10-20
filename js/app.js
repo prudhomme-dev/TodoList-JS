@@ -18,6 +18,14 @@ const importBanner = document.querySelector("#importBanner")
 const importAccept = document.querySelector("#importAccept")
 const importDecline = document.querySelector("#importDecline")
 const importCount = document.querySelector("#importCount")
+const settingsToggle = document.querySelector("#settingsToggle")
+const passwordDialog = document.querySelector("#passwordDialog")
+const passwordForm = document.querySelector("#passwordForm")
+const currentPassword = document.querySelector("#currentPassword")
+const newPassword = document.querySelector("#newPassword")
+const newPasswordConfirm = document.querySelector("#newPasswordConfirm")
+const dialogError = document.querySelector("#dialogError")
+const dialogCancel = document.querySelector("#dialogCancel")
 
 const MIN_PASSWORD_LENGTH = 8
 const LEGACY_STORAGE_KEYS = ["Task"]
@@ -165,6 +173,46 @@ unlockForm.addEventListener("submit", async (e) => {
         } else {
             showFieldError(unlockError, error.message)
         }
+    }
+})
+
+settingsToggle.addEventListener("click", () => {
+    showFieldError(dialogError, "")
+    passwordForm.reset()
+    passwordDialog.showModal()
+})
+
+dialogCancel.addEventListener("click", () => passwordDialog.close())
+
+passwordDialog.addEventListener("click", (e) => {
+    if (e.target === passwordDialog) passwordDialog.close()
+})
+
+passwordForm.addEventListener("submit", async (e) => {
+    e.preventDefault()
+    showFieldError(dialogError, "")
+
+    if (newPassword.value.length < MIN_PASSWORD_LENGTH) {
+        showFieldError(dialogError, "Le nouveau mot de passe doit contenir au moins " + MIN_PASSWORD_LENGTH + " caractères.")
+        return
+    }
+    if (newPassword.value !== newPasswordConfirm.value) {
+        showFieldError(dialogError, "Les deux mots de passe ne correspondent pas.")
+        return
+    }
+
+    try {
+        await changePassword(currentPassword.value, newPassword.value)
+        rememberPassword(newPassword.value)
+        passwordDialog.close()
+        passwordForm.reset()
+        showBanner("Mot de passe modifié.", "success")
+    } catch (error) {
+        if (error.status === 401) {
+            showFieldError(dialogError, "Mot de passe actuel incorrect.")
+            return
+        }
+        showFieldError(dialogError, error.message)
     }
 })
 

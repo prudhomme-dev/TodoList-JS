@@ -80,6 +80,15 @@
             </svg>
         </button>
 
+        <button type="button" id="settingsToggle" class="settingsToggle" aria-label="Réglages">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="3" />
+                <path
+                    d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+            </svg>
+        </button>
+
         <p class="statusBanner" id="statusBanner" role="status" data-tone="danger" hidden>
             <span id="statusBannerText"></span>
         </p>
@@ -118,6 +127,29 @@
                         alt="Licence Creative Commons"
                         src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a></small></p>
     </footer>
+
+    <dialog id="passwordDialog" class="dialog">
+        <form id="passwordForm" novalidate>
+            <h2 class="dialogTitle">Changer le mot de passe</h2>
+            <label class="gateField">
+                <span>Mot de passe actuel</span>
+                <input type="password" id="currentPassword" autocomplete="current-password" required>
+            </label>
+            <label class="gateField">
+                <span>Nouveau mot de passe</span>
+                <input type="password" id="newPassword" autocomplete="new-password" required>
+            </label>
+            <label class="gateField">
+                <span>Confirmation</span>
+                <input type="password" id="newPasswordConfirm" autocomplete="new-password" required>
+            </label>
+            <p class="dialogError" id="dialogError" hidden></p>
+            <div class="dialogActions">
+                <button type="button" id="dialogCancel" class="dialogSecondary">Annuler</button>
+                <button type="submit" class="gateSubmit">Changer le mot de passe</button>
+            </div>
+        </form>
+    </dialog>
 
     <script src="js/api.js"></script>
     <script src="js/todolist.js"></script>

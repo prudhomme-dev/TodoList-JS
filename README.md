@@ -61,8 +61,18 @@ La création est également refusée si `data/.htaccess` est absent.
 
 ## Changer de mot de passe
 
-Supprimer `data/password.txt` puis recharger le site, ou passer par
-`api/password.php` avec l'ancien et le nouveau mot de passe.
+Bouton réglages, en haut à droite de l'application : le formulaire demande le
+mot de passe actuel, le nouveau, puis sa confirmation.
+
+### Mot de passe oublié
+
+L'application n'a ni compte ni adresse e-mail : aucune réinitialisation par
+courriel n'est possible. La seule procédure consiste à passer par l'hébergeur :
+
+1. supprimer `data/password.txt` depuis le panneau Ni-Host ;
+2. recharger le site dans les **30 minutes** qui suivent, pour rouvrir la fenêtre
+   de création ;
+3. définir un nouveau mot de passe à l'écran « Première utilisation ».
 
 
 ## Protection contre la force brute
