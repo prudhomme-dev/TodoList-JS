@@ -30,50 +30,57 @@ const addTask = (e) => {
         tasks.push(new task(document.querySelector("#newTask").value, parseInt(choiceUser)))
         saveStorage("Task", tasks)
         document.querySelector("#newTask").value = ""
-        //console.log(JSON.parse(localStorage.getItem("Task")))
         displayTasks()
     }
 }
 
 const deleteTask = (e) => {
-    tasks.splice(e.target.dataset.idTask, 1)
+    tasks.splice(Number(e.currentTarget.dataset.idTask), 1)
     saveStorage("Task", tasks)
-    // Mettre en place le système de toast
     displayTasks()
-
 }
 
 const finishTask = (e) => {
-    tasks[e.target.dataset.idTask].status = true
+    tasks[Number(e.currentTarget.dataset.idTask)].status = true
     saveStorage("Task", tasks)
-    // Mettre en place le système de toast
     displayTasks()
 }
 
 const editTask = (e) => {
-    let newInput = document.createElement("input")
-    let task = document.querySelectorAll(".task")
-    newInput.type="text"
-    newInput.value=e.target.innerText
-    newInput.addEventListener("keydown", editTaskValidation)
-    for (let i=0; i<task.length; ++i)
-    {
-        if (task[i].dataset.idTask == e.target.dataset.idTask) {
-            task[i].insertBefore(newInput, task[i].querySelector(".titleTask"))
+    const taskElement = e.target.closest(".task")
+    const titleElement = taskElement.querySelector(".titleTask")
 
-        }
-    }
-    e.target.style.display="none"
+    const newInput = document.createElement("input")
+    newInput.type = "text"
+    newInput.value = tasks[Number(taskElement.dataset.idTask)].title
+    newInput.setAttribute("aria-label", "Modifier la tâche")
+    newInput.addEventListener("keydown", editTaskValidation)
+
+    taskElement.insertBefore(newInput, titleElement)
+    titleElement.style.display = "none"
+    newInput.focus()
+    newInput.select()
 }
 
 const editTaskValidation = (e) => {
-    if (e.key=="Escape")
-    {
-        console.log(e)
-        e.target.remove()
-        console.log(e.key, e.target.value)
+    const input = e.target
+    const taskElement = input.closest(".task")
+    const titleElement = taskElement.querySelector(".titleTask")
+
+    if (e.key === "Enter") {
+        const value = input.value.trim()
+        input.remove()
+        if (value) {
+            tasks[Number(taskElement.dataset.idTask)].title = value
+            saveStorage("Task", tasks)
+        }
+        displayTasks()
     }
-    
+
+    if (e.key === "Escape") {
+        input.remove()
+        titleElement.style.display = ""
+    }
 }
 
 const displayTasks = () => {
@@ -83,19 +90,19 @@ const displayTasks = () => {
         let Newtask = document.createElement("div")
         let newH3 = document.createElement("h3")
         let newDivAction = document.createElement("div")
-        let newAFinish = document.createElement("a")
-        let newADelete = document.createElement("a")
+        let newAFinish = document.createElement("button")
+        let newADelete = document.createElement("button")
         newDivAction.classList.add("actionTask")
         newDivAction.classList.add("flex")
         Newtask.classList.add("task")
         Newtask.dataset.idTask = i
         Newtask.classList.add("flex")
         newH3.classList.add("titleTask")
-        newH3.innerHTML = tasks[i].title
+        newH3.textContent = tasks[i].title
         newH3.title = tasks[i].title
         newH3.dataset.idTask = i
         newH3.addEventListener("dblclick", editTask)
-        if (tasks[i].status == 0) {
+        if (!tasks[i].status) {
 
             if (tasks[i].priority == 0) Newtask.classList.add("lowPriority")
             else if (tasks[i].priority == 1) Newtask.classList.add("normalPriority")
@@ -104,7 +111,9 @@ const displayTasks = () => {
             list.appendChild(Newtask)
             newAFinish.addEventListener("click", finishTask)
             newAFinish.dataset.idTask = i
+            newAFinish.type = "button"
             newAFinish.classList.add("finishTask")
+            newAFinish.setAttribute("aria-label", "Terminer la tâche")
             newDivAction.appendChild(newAFinish)
         } else {
             Newtask.classList.add("archived")
@@ -112,7 +121,9 @@ const displayTasks = () => {
         }
         newADelete.dataset.idTask = i
         newADelete.addEventListener("click", deleteTask)
+        newADelete.type = "button"
         newADelete.classList.add("deleteTask")
+        newADelete.setAttribute("aria-label", "Supprimer la tâche")
         newDivAction.appendChild(newADelete)
         Newtask.appendChild(newH3)
         Newtask.appendChild(newDivAction)
@@ -131,7 +142,6 @@ const clickPriority = (e) => {
     }
 }
 
-// Activation du clique des priorités
 for (let i = 0; i < priorityTask.length; ++i) {
     priorityTask[i].addEventListener("click", clickPriority)
 }
