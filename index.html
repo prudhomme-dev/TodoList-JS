@@ -15,10 +15,58 @@
 
 <body>
 
-    <main>
+    <div class="gate" id="screenLoading">
+        <p class="gateText">Chargement…</p>
+    </div>
+
+    <div class="gate" id="screenSetup" hidden>
+        <div class="gatePanel">
+            <h1 class="gateTitle">Première utilisation</h1>
+            <p class="gateText">Choisissez un mot de passe d'au moins 8 caractères. Il sera demandé à chaque ouverture.</p>
+            <form id="setupForm" novalidate>
+                <label class="gateField">
+                    <span>Mot de passe</span>
+                    <input type="password" id="setupPassword" autocomplete="new-password" required>
+                </label>
+                <label class="gateField">
+                    <span>Confirmation</span>
+                    <input type="password" id="setupConfirm" autocomplete="new-password" required>
+                </label>
+                <p class="gateError" id="setupError" hidden></p>
+                <button type="submit" class="gateSubmit">Créer le mot de passe</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="gate" id="screenUnlock" hidden>
+        <div class="gatePanel">
+            <h1 class="gateTitle">TodoList</h1>
+            <form id="unlockForm" novalidate>
+                <label class="gateField">
+                    <span>Mot de passe</span>
+                    <input type="password" id="unlockPassword" autocomplete="current-password" required>
+                </label>
+                <p class="gateError" id="unlockError" hidden></p>
+                <button type="submit" class="gateSubmit">Déverrouiller</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="gate" id="screenBlocked" hidden>
+        <div class="gatePanel gatePanelDanger">
+            <h1 class="gateTitle">Stockage exposé</h1>
+            <p class="gateText">Le fichier <code>data/password.txt</code> est téléchargeable publiquement. Votre mot de passe ne protège rien tant que ce fichier est accessible.</p>
+            <p class="gateText">Vérifiez que le fichier <code>data/.htaccess</code> a bien été envoyé sur le serveur et qu'il contient une règle de refus.</p>
+        </div>
+    </div>
+
+    <main id="app" hidden>
+
         <header class="appHeader">
             <h1>Ma Todo-List</h1>
         </header>
+
+        <p class="taskCounter" aria-hidden="true"></p>
 
         <button type="button" id="themeToggle" class="themeToggle" aria-label="Passer en thème sombre">
             <svg class="iconSun" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
@@ -31,6 +79,16 @@
                 <path d="M20.5 14.2A8.5 8.5 0 1 1 9.8 3.5a6.8 6.8 0 0 0 10.7 10.7z" />
             </svg>
         </button>
+
+        <p class="statusBanner" id="statusBanner" role="status" data-tone="danger" hidden>
+            <span id="statusBannerText"></span>
+        </p>
+
+        <p class="importBanner" id="importBanner" role="status" hidden>
+            <span><strong id="importCount">0</strong> tâche(s) sont encore enregistrées dans ce navigateur. Les transférer vers le serveur&nbsp;?</span>
+            <button type="button" id="importAccept" class="linkButton">Transférer</button>
+            <button type="button" id="importDecline" class="linkButton linkButtonMuted">Ignorer</button>
+        </p>
 
         <section class="action" aria-label="Ajouter une tâche">
             <input type="text" name="newTask" id="newTask" placeholder="Quelle tâche à ajouter ?" autocomplete="off"
@@ -54,14 +112,16 @@
         <section class="listArchives"></section>
     </main>
 
-    <footer>
+    <footer hidden>
         <p><small class="copyright">2022 - Cédric PRUD'HOMME -
                 <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img
                         alt="Licence Creative Commons"
                         src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a></small></p>
     </footer>
 
+    <script src="js/api.js"></script>
     <script src="js/todolist.js"></script>
+    <script src="js/app.js"></script>
 
 </body>
 

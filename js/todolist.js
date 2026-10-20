@@ -6,20 +6,7 @@ class task {
     }
 }
 
-const saveStorage = (key, data) => {
-    let jsonTask = JSON.stringify(data)
-    localStorage.setItem(key, jsonTask)
-}
-
-const readStorage = (key) => {
-    return JSON.parse(localStorage.getItem(key))
-}
-
 let tasks = []
-if (JSON.parse(localStorage.getItem("Task"))) {
-    tasks = readStorage("Task")
-}
-
 let priorityTask = document.querySelectorAll(".priorityTask")
 let list = document.querySelector(".list")
 let listArchives = document.querySelector(".listArchives")
@@ -28,22 +15,22 @@ let choiceUser = 1
 const addTask = (e) => {
     if (e.key == "Enter" && e.target.value) {
         tasks.push(new task(document.querySelector("#newTask").value, parseInt(choiceUser)))
-        saveStorage("Task", tasks)
         document.querySelector("#newTask").value = ""
         displayTasks()
+        save()
     }
 }
 
 const deleteTask = (e) => {
     tasks.splice(Number(e.currentTarget.dataset.idTask), 1)
-    saveStorage("Task", tasks)
     displayTasks()
+    save()
 }
 
 const finishTask = (e) => {
     tasks[Number(e.currentTarget.dataset.idTask)].status = true
-    saveStorage("Task", tasks)
     displayTasks()
+    save()
 }
 
 const editTask = (e) => {
@@ -72,9 +59,11 @@ const editTaskValidation = (e) => {
         input.remove()
         if (value) {
             tasks[Number(taskElement.dataset.idTask)].title = value
-            saveStorage("Task", tasks)
+            displayTasks()
+            save()
+        } else {
+            displayTasks()
         }
-        displayTasks()
     }
 
     if (e.key === "Escape") {
@@ -93,10 +82,8 @@ const displayTasks = () => {
         let newAFinish = document.createElement("button")
         let newADelete = document.createElement("button")
         newDivAction.classList.add("actionTask")
-        newDivAction.classList.add("flex")
         Newtask.classList.add("task")
         Newtask.dataset.idTask = i
-        Newtask.classList.add("flex")
         newH3.classList.add("titleTask")
         newH3.textContent = tasks[i].title
         newH3.title = tasks[i].title
@@ -129,8 +116,8 @@ const displayTasks = () => {
         Newtask.appendChild(newDivAction)
 
     }
-    if (document.querySelectorAll(".listArchives .task").length) document.querySelector(".taskArchivedTitle").style.display="block"
-    else document.querySelector(".taskArchivedTitle").style.display="none"
+    if (document.querySelectorAll(".listArchives .task").length) document.querySelector(".taskArchivedTitle").style.display = "block"
+    else document.querySelector(".taskArchivedTitle").style.display = "none"
 }
 
 const clickPriority = (e) => {
@@ -147,4 +134,3 @@ for (let i = 0; i < priorityTask.length; ++i) {
 }
 
 document.querySelector("#newTask").addEventListener("keydown", addTask)
-displayTasks()

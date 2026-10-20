@@ -20,6 +20,7 @@
     --priority-high: #F87171;
     --success: #16A34A;
     --danger: #DC2626;
+    --danger-soft: rgba(220, 38, 38, 0.10);
 
     --shadow-1: 0 1px 2px rgba(16, 16, 24, 0.06), 0 1px 3px rgba(16, 16, 24, 0.08);
     --shadow-2: 0 6px 16px rgba(16, 16, 24, 0.10);
@@ -56,6 +57,7 @@
     --priority-high: #FB7185;
     --success: #4ADE80;
     --danger: #F87171;
+    --danger-soft: rgba(248, 113, 113, 0.14);
 
     --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.50);
     --shadow-2: 0 8px 20px rgba(0, 0, 0, 0.55);
@@ -152,8 +154,8 @@ button {
 main {
     display: grid;
     grid-template-columns: 1fr auto auto;
-    grid-template-areas: "header counter toggle" "action action action" "list list list" "archived archived archived"
-        "archives archives archives";
+    grid-template-areas: "header counter toggle" "status status status" "import import import" "action action action"
+        "list list list" "archived archived archived" "archives archives archives";
     align-items: center;
     column-gap: 14px;
     row-gap: 18px;
@@ -224,6 +226,161 @@ h1 {
 
 [data-theme="dark"] .themeToggle .iconMoon {
     display: block;
+}
+
+.gate {
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+    padding: 24px;
+}
+
+.gate[hidden] {
+    display: none;
+}
+
+.gatePanel {
+    width: min(100%, 420px);
+    padding: 30px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-3);
+}
+
+.gatePanelDanger {
+    border-color: var(--danger);
+}
+
+.gateTitle {
+    margin: 0 0 8px;
+    font-size: 1.45rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    background-image: linear-gradient(100deg, var(--brand), var(--brand-alt));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.gateText {
+    margin: 0 0 18px;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.gatePanel code {
+    padding: 1px 5px;
+    font-size: 0.85em;
+    background: var(--surface-sunken);
+    border-radius: 5px;
+}
+
+.gateField {
+    display: block;
+    margin-bottom: 14px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.gateField input {
+    display: block;
+    width: 100%;
+    margin-top: 6px;
+    padding: 12px 16px;
+    font: inherit;
+    font-size: 1rem;
+    color: var(--text);
+    background: var(--surface-sunken);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+}
+
+.gateField input:focus {
+    outline: none;
+    border-color: var(--brand);
+    box-shadow: 0 0 0 4px var(--ring);
+}
+
+.gateError {
+    margin: 0 0 14px;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    color: var(--danger);
+    background: var(--danger-soft);
+    border: 1px solid var(--danger);
+    border-radius: var(--radius-sm);
+}
+
+.gateError[hidden] {
+    display: none;
+}
+
+.gateSubmit {
+    width: 100%;
+    padding: 14px;
+    font: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #FFFFFF;
+    background: var(--brand);
+    border: none;
+    border-radius: var(--radius-md);
+    transition: filter var(--speed) ease;
+}
+
+.gateSubmit:hover {
+    filter: brightness(1.12);
+}
+
+.statusBanner {
+    grid-area: status;
+    margin: 0;
+    padding: 12px 16px;
+    font-size: 0.85rem;
+    color: var(--danger);
+    background: var(--danger-soft);
+    border: 1px solid var(--danger);
+    border-radius: var(--radius-md);
+}
+
+.importBanner {
+    grid-area: import;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 12px 16px;
+    font-size: 0.85rem;
+    color: var(--text);
+    background: var(--surface-sunken);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+}
+
+.linkButton {
+    padding: 4px 10px;
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--brand);
+    background: transparent;
+    border: 1px solid currentColor;
+    border-radius: var(--radius-pill);
+}
+
+.linkButton:hover {
+    filter: brightness(1.15);
+}
+
+.linkButtonMuted {
+    color: var(--text-muted);
+}
+
+[hidden] {
+    display: none !important;
 }
 
 .action {
@@ -504,7 +661,8 @@ footer {
 @media (max-width: 700px) {
     main {
         grid-template-columns: 1fr auto;
-        grid-template-areas: "header toggle" "action action" "list list" "archived archived" "archives archives";
+        grid-template-areas: "header toggle" "status status" "import import" "action action" "list list" "archived archived"
+        "archives archives";
         row-gap: 16px;
         width: calc(100% - 24px);
         margin: 20px auto 24px;
