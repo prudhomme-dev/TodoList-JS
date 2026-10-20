@@ -3,6 +3,9 @@
 
 Petite application de gestion de tâches à effectuer avec un stockage local.
 
+Thème clair ou sombre, automatiquement-aligné sur la préférence système et
+commutable via le bouton en haut de page (mémorisé dans le localStorage).
+
 
 
 ## Auteur
