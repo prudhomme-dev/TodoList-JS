@@ -14,7 +14,7 @@
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $path = $path === null ? '/' : $path;
 
-$blocked = ['/data/'];
+$blocked = ['/data/', '/scripts/'];
 foreach ($blocked as $prefix) {
     if (strpos($path, $prefix) === 0) {
         http_response_code(403);

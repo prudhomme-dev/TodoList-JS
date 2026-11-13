@@ -89,6 +89,44 @@ Cinq tentatives échouées par adresse IP déclenchent un blocage croissant
 lisible et modifiable à la main, à condition de respecter la structure JSON.
 
 
+## Site de démonstration
+
+Sur une instance publique de démonstration, les données peuvent être purgées
+automatiquement. Le script `scripts/reset-demo.php` supprime les tâches et
+l'état de blocage, puis réécrit un mot de passe de démonstration fixe, afin que
+la démo reste accessible en permanence.
+
+Le script ne s'exécute qu'en ligne de commande (il répond `403` s'il est
+appelé en HTTP) et `scripts/.htaccess` interdit l'accès au dossier.
+
+Programmation dans le panneau de l'hébergeur, toutes les heures :
+
+```
+0 * * * * /usr/bin/php /home/<utilisateur>/www/<site>/scripts/reset-demo.php
+```
+
+Exécution manuelle :
+
+```
+php scripts/reset-demo.php
+```
+
+Le mot de passe de démonstration est `demo1234` par défaut. Il peut être
+redéfini avec la variable d'environnement `DEMO_PASSWORD` :
+
+```
+0 * * * * DEMO_PASSWORD=unMotDePasse /usr/bin/php /chemin/scripts/reset-demo.php
+```
+
+Le script est lui-même protégé : une purge n'est exécutée que si la dernière
+a eu lieu plus d'une heure auparavant (`data/reset-demo.json` conserve
+l'horodatage), et un verrou empêche deux exécutions simultanées. Les traces
+sont consignées dans `data/reset-demo.log`.
+
+> À n'utiliser que sur une instance de démonstration : les tâches et le mot de
+> passe sont réinitialisés périodiquement.
+
+
 ## Auteur
 
 - [@prudhomme-dev](https://github.com/prudhomme-dev)

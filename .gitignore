@@ -2,3 +2,4 @@ data/tasks.json
 data/lock.json
 data/*.tmp
 data/password.txt
+data/reset-demo.*
