@@ -8,24 +8,23 @@ declare(strict_types=1);
  * Supprime les taches et l'etat de blocage, puis reecrit un mot de passe de
  * demonstration fixe afin que la demo reste accessible en permanence.
  *
- * Usage (cron, toutes les heures) :
+ * Cron (toutes les heures) :
  *
- *   0 * * * * /usr/bin/php /chemin/vers/scripts/reset-demo.php
+ *   0 * * * * DEMO_TOKEN=<jeton> /usr/bin/php -q /chemin/vers/scripts/reset-demo.php
  *
- * Le mot de passe peut etre redefini avec la variable d'environnement
- * DEMO_PASSWORD. Le script ne s'execute qu'en ligne de commande : toute
- * requete HTTP recoit un 403.
+ * -q supprime les en-tetes HTTP que php-cgi imprime en mode shell. Le jeton se
+ * transmet par la variable d'environnement DEMO_TOKEN : php-cgi n'expose pas
+ * $argv, un argument --token= serait donc ignore.
+ *
+ * Tout appel HTTP est refuse, jeton ou non : la seule barriere verifiee en
+ * premier est la nature de la requete. DEMO_TOKEN reste optionnel, pour exiger
+ * une autorisation explicite meme depuis un shell. Il est alors enregistre a la
+ * premiere execution dans data/reset-demo.token (reimpression :
+ * DEMO_PRINT_TOKEN=1).
  */
 
 const RESET_INTERVAL = 3600;
 const DEFAULT_DEMO_PASSWORD = 'demo1234';
-
-if (PHP_SAPI !== 'cli') {
-    http_response_code(403);
-    header('Content-Type: text/plain; charset=utf-8');
-    echo "Acces refuse.";
-    exit;
-}
 
 $root = dirname(__DIR__);
 $dataDir = $root . '/data';
@@ -33,6 +32,21 @@ $stateFile = $dataDir . '/reset-demo.json';
 $lockFile = $dataDir . '/reset-demo.lock';
 $logFile = $dataDir . '/reset-demo.log';
 $passwordFile = $dataDir . '/password.txt';
+$tokenFile = $dataDir . '/reset-demo.token';
+
+function out(string $message): void
+{
+    echo $message . PHP_EOL;
+}
+
+function err(string $message): void
+{
+    $stream = fopen('php://stderr', 'w');
+    if ($stream !== false) {
+        fwrite($stream, $message . PHP_EOL);
+        fclose($stream);
+    }
+}
 
 function log_line(string $file, string $message): void
 {
@@ -42,12 +56,78 @@ function log_line(string $file, string $message): void
 function fail(string $message, string $logFile): void
 {
     log_line($logFile, 'ERREUR ' . $message);
-    fwrite(STDERR, 'ERREUR : ' . $message . PHP_EOL);
+    err('ERREUR : ' . $message);
     exit(1);
+}
+
+function looks_like_http_request(): bool
+{
+    if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') {
+        return false;
+    }
+    foreach (array('REQUEST_METHOD', 'HTTP_HOST', 'SERVER_SOFTWARE') as $marker) {
+        if (isset($_SERVER[$marker])) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function read_token(string $file): ?string
+{
+    if (!is_file($file)) {
+        return null;
+    }
+    $token = trim((string) file_get_contents($file));
+    return $token === '' ? null : $token;
+}
+
+function create_token(string $file): string
+{
+    $token = bin2hex(random_bytes(24));
+    @file_put_contents($file, $token . PHP_EOL, LOCK_EX);
+    return $token;
+}
+
+function wants_print_token(): bool
+{
+    $flag = getenv('DEMO_PRINT_TOKEN');
+    return is_string($flag) && $flag !== '' && $flag !== '0';
 }
 
 if (!is_dir($dataDir) || !is_writable($dataDir)) {
     fail('dossier data/ absent ou non inscriptible.', $logFile);
+}
+
+if (looks_like_http_request()) {
+    log_line($logFile, 'Refus : requete HTTP (SAPI ' . PHP_SAPI . ').');
+    http_response_code(403);
+    header('Content-Type: text/plain; charset=utf-8');
+    header('Cache-Control: no-store');
+    echo 'Acces refuse.';
+    exit;
+}
+
+$expectedToken = read_token($tokenFile);
+$providedToken = getenv('DEMO_TOKEN');
+
+if (wants_print_token()) {
+    out('Jeton : ' . ($expectedToken !== null ? $expectedToken : create_token($tokenFile)));
+    exit(0);
+}
+
+if (is_string($providedToken) && $providedToken !== '') {
+    if ($expectedToken === null) {
+        @file_put_contents($tokenFile, $providedToken . PHP_EOL, LOCK_EX);
+        $expectedToken = $providedToken;
+        log_line($logFile, 'Jeton enregistre depuis DEMO_TOKEN.');
+    }
+    if (!hash_equals($expectedToken, $providedToken)) {
+        log_line($logFile, 'Refus : DEMO_TOKEN sans correspondance (SAPI ' . PHP_SAPI . ').');
+        err('Acces refuse.');
+        err('DEMO_TOKEN ne correspond pas au jeton enregistre (reimpression : DEMO_PRINT_TOKEN=1).');
+        exit(1);
+    }
 }
 
 $lock = @fopen($lockFile, 'c');
@@ -56,7 +136,7 @@ if ($lock === false) {
 }
 if (!flock($lock, LOCK_EX | LOCK_NB)) {
     log_line($logFile, 'Purge ignoree : une autre execution est en cours.');
-    fwrite(STDOUT, "Une autre execution est deja en cours." . PHP_EOL);
+    out('Une autre execution est deja en cours.');
     exit(0);
 }
 
@@ -73,7 +153,7 @@ $elapsed = time() - $lastReset;
 if ($lastReset > 0 && $elapsed < RESET_INTERVAL) {
     $remaining = (int) ceil((RESET_INTERVAL - $elapsed) / 60);
     log_line($logFile, sprintf('Purge ignoree : %d min depuis la derniere purge.', (int) floor($elapsed / 60)));
-    fwrite(STDOUT, sprintf('Prochaine purge dans %d min.', $remaining) . PHP_EOL);
+    out(sprintf('Prochaine purge dans %d min.', $remaining));
     exit(0);
 }
 
@@ -112,4 +192,4 @@ if (@file_put_contents($passwordFile, $hash . PHP_EOL, LOCK_EX) === false) {
 );
 
 log_line($logFile, $removed === array() ? 'Purge effectuee : rien a supprimer.' : 'Purge effectuee : ' . implode(', ', $removed) . '.');
-fwrite(STDOUT, 'Purge effectuee.' . PHP_EOL);
+out('Purge effectuee.');

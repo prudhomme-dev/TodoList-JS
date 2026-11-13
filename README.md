@@ -96,14 +96,18 @@ automatiquement. Le script `scripts/reset-demo.php` supprime les tâches et
 l'état de blocage, puis réécrit un mot de passe de démonstration fixe, afin que
 la démo reste accessible en permanence.
 
-Le script ne s'exécute qu'en ligne de commande (il répond `403` s'il est
-appelé en HTTP) et `scripts/.htaccess` interdit l'accès au dossier.
+Le script refuse tout appel HTTP, jeton ou non (réponse `403`), et
+`scripts/.htaccess` interdit l'accès au dossier : il ne peut donc s'exécuter
+que depuis un shell.
 
 Programmation dans le panneau de l'hébergeur, toutes les heures :
 
 ```
-0 * * * * /usr/bin/php /home/<utilisateur>/www/<site>/scripts/reset-demo.php
+0 * * * * /usr/bin/php -q /home/<utilisateur>/www/<site>/scripts/reset-demo.php
 ```
+
+`-q` supprime les en-têtes `Content-type` imprimés par `php-cgi` en mode shell
+(sur certains hébergeurs, `/usr/bin/php` est en réalité `php-cgi`).
 
 Exécution manuelle :
 
@@ -115,8 +119,23 @@ Le mot de passe de démonstration est `demo1234` par défaut. Il peut être
 redéfini avec la variable d'environnement `DEMO_PASSWORD` :
 
 ```
-0 * * * * DEMO_PASSWORD=unMotDePasse /usr/bin/php /chemin/scripts/reset-demo.php
+0 * * * * DEMO_PASSWORD=unMotDePasse /usr/bin/php -q /chemin/scripts/reset-demo.php
 ```
+
+### Autorisation optionnelle
+
+Par défaut, toute exécution depuis un shell est acceptée. Pour exiger une
+autorisation explicite, positionnez `DEMO_TOKEN` : la première exécution
+l'enregistre dans `data/reset-demo.token`, les suivantes doivent le reprendre
+à l'identique.
+
+```
+0 * * * * DEMO_TOKEN=<jeton> /usr/bin/php -q /chemin/scripts/reset-demo.php
+```
+
+Le jeton s'affiche avec `DEMO_PRINT_TOKEN=1`. Il se transmet par variable
+d'environnement : `php-cgi` n'expose pas `$argv`, un argument `--token=` serait
+ignoré.
 
 Le script est lui-même protégé : une purge n'est exécutée que si la dernière
 a eu lieu plus d'une heure auparavant (`data/reset-demo.json` conserve
